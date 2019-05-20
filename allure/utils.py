@@ -82,7 +82,7 @@ def labels_of(item):
 
         markers = list()
         for suitable_name in suitable_names:
-            markers.append(item.get_marker(suitable_name))
+            markers.append(marker_of_node(item, suitable_name))
 
         return markers
 
@@ -181,3 +181,13 @@ def mangle_testnames(names):
     names = [x.replace(".py", "") for x in names if x != '()']
     names[0] = names[0].replace("/", '.')
     return names
+
+
+def marker_of_node(node, name):
+    """
+    Return marker of node by name
+    """
+    try:
+        return node.get_marker(name)
+    except AttributeError:
+        return node.get_closest_marker(name)
