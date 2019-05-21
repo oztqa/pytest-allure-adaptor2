@@ -10,7 +10,7 @@ from allure.common import AllureImpl, StepContext
 from allure.constants import Status, AttachmentType, Severity, \
     FAILED_STATUSES, Label, SKIPPED_STATUSES
 from allure.utils import parent_module, parent_down_from_module, labels_of, \
-    all_of, get_exception_message, now, mangle_testnames
+    all_of, get_exception_message, now, mangle_testnames, marker_of_node
 from allure.structure import TestCase, TestStep, Attach, TestSuite, Failure, TestLabel
 
 
@@ -71,6 +71,16 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
+    pytest.allure = MASTER_HELPER
+
+    for label in (
+            Label.FEATURE, Label.STORY,
+            Label.SEVERITY, Label.ISSUE,
+            Label.TESTCASE, Label.THREAD,
+            Label.HOST, Label.FRAMEWORK,
+            Label.LANGUAGE):
+        config.addinivalue_line("markers", "%s.%s: this allure adaptor marker." % (Label.DEFAULT, label))
+
     reportdir = config.option.allurereportdir
 
     if reportdir:  # we actually record something
@@ -236,7 +246,7 @@ class AllureTestListener(object):
         """
         report = (yield).get_result()
 
-        status = self.config.hook.pytest_report_teststatus(report=report)
+        status = self.config.hook.pytest_report_teststatus(report=report, config=self.config)
         status = status and status[0]
 
         if report.when == 'call':
@@ -273,7 +283,7 @@ class AllureTestListener(object):
                     # TODO: think about that once again
                     self.test.status = Status.BROKEN
             # if a test isn't marked as "unreported" or it has failed, add it to the report.
-            if not item.get_marker("unreported") or self.test.status in FAILED_STATUSES:
+            if not marker_of_node(item, "unreported") or self.test.status in FAILED_STATUSES:
                 self.report_case(item, report)
 
 
@@ -459,10 +469,6 @@ class AllureHelper(object):
 
 
 MASTER_HELPER = AllureHelper()
-
-
-def pytest_namespace():
-    return {'allure': MASTER_HELPER}
 
 
 class AllureAgregatingListener(object):
