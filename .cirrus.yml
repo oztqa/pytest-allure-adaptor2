@@ -1,6 +1,10 @@
 container:
   image: python:3.7
 
+test_task:
+  script:
+    - echo "Tests here"
+
 do_release_task:
   timeout_in: 5m
   only_if: $CIRRUS_TAG != ''
