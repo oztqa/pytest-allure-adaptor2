@@ -28,7 +28,6 @@ def main():
         author_email="pupssman@yandex-team.ru",
         packages=["allure"],
         url="https://github.com/allure-framework/allure-pytest",
-        long_description=read('README.rst'),
         entry_points={'pytest11': ['allure_adaptor = allure.pytest_plugin']},
         install_requires=install_requires,
         setup_requires=['setuptools-git-version'],
