@@ -1,0 +1,14 @@
+container:
+  image: python:3.7
+
+do_release_task:
+  timeout_in: 5m
+  only_if: $CIRRUS_TAG != ''
+  environment:
+    PYPI_USER: ENCRYPTED[e7283022ee4ec6b09afb41967a6498f14136241a15a6a126fee5e375cd9c84d05ce8c7a32fbb9a5eb8327bf1eb1df51a]
+    PYPI_PASSWORD: ENCRYPTED[10a94090b2a3e78b7fbe79075ff23980bf6f4d2c4067964d252fd94dfc3e636bab68a3d8e8891c0d7c47597122c71cff]
+  script:
+    - pip install twine
+    - ./genpypirc
+    - python setup.py sdist
+    - twine upload dist/*
