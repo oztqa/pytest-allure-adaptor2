@@ -1,16 +1,12 @@
 container:
   image: python:3.7
 
-test_task:
-  script:
-    - echo "Hello World!"
-
 do_release_task:
   timeout_in: 5m
   only_if: $CIRRUS_TAG != ''
   environment:
-    PYPI_USER: ENCRYPTED[e7283022ee4ec6b09afb41967a6498f14136241a15a6a126fee5e375cd9c84d05ce8c7a32fbb9a5eb8327bf1eb1df51a]
-    PYPI_PASSWORD: ENCRYPTED[10a94090b2a3e78b7fbe79075ff23980bf6f4d2c4067964d252fd94dfc3e636bab68a3d8e8891c0d7c47597122c71cff]
+    PYPI_USER: ENCRYPTED[853a93f195f33618d0941ca5400f8209098e301434a78dbc41ef61afaadf2b22c3a975c05df5b792c4b6dc37224eddcc]
+    PYPI_PASSWORD: ENCRYPTED[8e347921b380b0bcc4c22f6b46c1f2588ebc633b43f9caf495a55c562bbb00cc9155d8b8c5bd5b947b4b664c74717a4c]
   script:
     - pip install twine
     - ./genpypirc
