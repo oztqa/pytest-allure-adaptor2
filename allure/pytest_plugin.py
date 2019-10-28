@@ -1,9 +1,10 @@
+import inspect
 import uuid
 import pickle
 import pytest
 import argparse
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from six import text_type
 
 from allure.common import AllureImpl, StepContext
@@ -96,6 +97,14 @@ def pytest_configure(config):
             config.pluginmanager.register(AllureCollectionListener(allure_impl))
 
 
+def extract_nodeid_from_stack():
+    runtest_frames_infos = [fi for fi in inspect.stack() if fi.function == 'pytest_runtest_protocol']
+    if len(runtest_frames_infos) == 0:
+        # we should never get here
+        return 'default'
+    return runtest_frames_infos[0].frame.f_locals['item'].nodeid
+
+
 class AllureTestListener(object):
     """
     Per-test listener.
@@ -106,14 +115,45 @@ class AllureTestListener(object):
 
     def __init__(self, config):
         self.config = config
-        self.environment = {}
-        self.test = None
+        self._environments = defaultdict(dict)
+        self._test = {}
+        self._stack = {}
 
         # FIXME: that flag makes us pre-report failures in the makereport hook.
         # it is here to cope with xdist's begavior regarding -x.
         # see self.pytest_runtest_makereport and AllureAgregatingListener.pytest_sessionfinish
 
         self._magicaldoublereport = hasattr(self.config, 'slaveinput') and self.config.getvalue("maxfail")
+
+    @property
+    def environment(self):
+        nodeid = extract_nodeid_from_stack()
+        return self._environments[nodeid]
+
+    @environment.setter
+    def environment(self, value):
+        nodeid = extract_nodeid_from_stack()
+        self._environments[nodeid] = value
+
+    @property
+    def test(self):
+        nodeid = extract_nodeid_from_stack()
+        return self._test[nodeid]
+
+    @test.setter
+    def test(self, value):
+        nodeid = extract_nodeid_from_stack()
+        self._test[nodeid] = value
+
+    @property
+    def stack(self):
+        nodeid = extract_nodeid_from_stack()
+        return self._stack[nodeid]
+
+    @stack.setter
+    def stack(self, value):
+        nodeid = extract_nodeid_from_stack()
+        self._stack[nodeid] = value
 
     @pytest.mark.hookwrapper
     def pytest_runtest_protocol(self, item, nextitem):
