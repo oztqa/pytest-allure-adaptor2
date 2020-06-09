@@ -10,7 +10,6 @@ import sys
 
 from six import u, unichr
 from lxml import objectify
-from namedlist import namedlist
 
 from allure.utils import unicodify
 
@@ -112,8 +111,49 @@ class WrappedMany(Many):
 
 def xmlfied(el_name, namespace='', fields=[], **kw):
     items = fields + sorted(kw.items())
+    names = [item[0] for item in items]
 
-    class MyImpl(namedlist('XMLFied', [(item[0], None) for item in items])):
+    class MyImpl:
+        def __init__(self, *args, **kwargs):
+            if len(args) > len(names):
+                raise ValueError('Only ' + str(len(names)) + ' position arguments expected')
+            self._dict = {}
+            self._items = items
+            self._names = names
+            for i, value in enumerate(args):
+                self._dict[self._names[i]] = value
+            for name, value in kwargs.items():
+                if name not in self._names:
+                    raise ValueError('Unrecognized argument ' + str(name))
+                self._dict[name] = value
+            for name in self._names:
+                self._dict.setdefault(name, None)
+                if name not in self._dict:
+                    self._dict[name] = None
+
+        def __getattr__(self, item):
+            return self._dict[item]
+
+        def __setattr__(self, key, value):
+            if key[0] == '_':
+                self.__dict__[key] = value
+                return
+            assert key in self._names
+            self._dict[key] = value
+
+        def __getstate__(self):
+            state = {
+                "names": self._names,
+                "dict": self._dict,
+            }
+            return state
+
+        def __setstate__(self, state):
+            self._names = state['names']
+            self._dict = state['dict']
+
+        def __eq__(self, other):
+            return self._dict == other._dict
 
         def toxml(self):
             el = element_maker(el_name, namespace)

@@ -7,7 +7,6 @@ PACKAGE = "pytest-allure-adaptor2"
 install_requires = [
     "lxml>=3.2.0",
     "pytest>=2.7.3",
-    "namedlist",
     "six>=1.9.0"
 ]
 

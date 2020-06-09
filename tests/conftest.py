@@ -21,7 +21,9 @@ def schema():
 
 @pytest.fixture
 def reportdir(testdir):
-    return testdir.tmpdir.join("my_report_dir")
+    dir = testdir.tmpdir.join("my_report_dir")
+    os.makedirs(str(dir), exist_ok=True)
+    return dir
 
 
 @pytest.fixture(params=['local', 'xdist-parallel'])
