@@ -118,7 +118,6 @@ def xmlfied(el_name, namespace='', fields=[], **kw):
             if len(args) > len(names):
                 raise ValueError('Only ' + str(len(names)) + ' position arguments expected')
             self._dict = {}
-            self._items = items
             self._names = names
             for i, value in enumerate(args):
                 self._dict[self._names[i]] = value
