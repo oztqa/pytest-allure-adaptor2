@@ -13,7 +13,6 @@ from functools import wraps
 import py
 from _pytest import __version__ as pytest_version
 from lxml import etree
-from six import text_type, iteritems
 
 from allure.constants import AttachmentType, Status
 from allure.structure import Attach, TestStep, TestCase, TestSuite, Failure, Environment, EnvParameter
@@ -203,7 +202,7 @@ class AllureImpl(object):
             id=uuid.uuid4(),
             name="Allure environment parameters",
             parameters=[])
-        for key, value in iteritems(self.environment):
+        for key, value in self.environment.items():
             environment.parameters.append(
                 EnvParameter(name=key, key=key, value=value))
 
@@ -218,7 +217,7 @@ class AllureImpl(object):
         """
         with self._attachfile("%s-attachment.%s" %
                               (uuid.uuid4(), attach_type.extension)) as f:
-            if isinstance(body, text_type):
+            if isinstance(body, str):
                 f.write(body.encode('utf-8'))
             else:
                 f.write(body)
@@ -255,4 +254,4 @@ class AllureImpl(object):
                 xmlfied.toxml(),
                 pretty_print=True,
                 xml_declaration=False,
-                encoding=text_type))
+                encoding=str))

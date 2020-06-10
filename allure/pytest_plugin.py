@@ -5,7 +5,6 @@ import pytest
 import argparse
 
 from collections import namedtuple, defaultdict
-from six import text_type
 
 from allure.common import AllureImpl, StepContext
 from allure.constants import Status, AttachmentType, Severity, \
@@ -335,7 +334,7 @@ def pytest_runtest_setup(item):
                              item.config.option.allureseverities)
 
     if arg_labels and not item_labels & arg_labels:
-        pytest.skip('Not suitable with selected labels: %s.' % ', '.join(text_type(l) for l in sorted(arg_labels)))
+        pytest.skip('Not suitable with selected labels: %s.' % ', '.join(str(l) for l in sorted(arg_labels)))
 
 
 class LazyInitStepContext(StepContext):

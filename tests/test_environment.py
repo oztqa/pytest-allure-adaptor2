@@ -6,8 +6,6 @@ Tests for environment parameters
 @author: svchipiga
 '''
 
-from six import iterkeys, itervalues
-
 import os
 
 import pytest
@@ -16,11 +14,11 @@ from hamcrest.core.core.allof import all_of
 
 
 def first_key(d):
-    return next(iterkeys(d))
+    return next(d.keys())
 
 
 def first_value(d):
-    return next(itervalues(d))
+    return next(d.values())
 
 
 @pytest.mark.parametrize("env_dict", ({'a': 1, 'b': 2}, {'a': 1, 'b': 2, 'c': 3}))
