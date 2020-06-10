@@ -16,8 +16,6 @@ import threading
 import platform
 import socket
 
-from six import text_type, binary_type
-from six.moves import filter
 from traceback import format_exception_only
 
 from _pytest.python import Module
@@ -120,13 +118,13 @@ def all_of(enum):
 
 
 def unicodify(something):
-    if isinstance(something, text_type):
+    if isinstance(something, str):
         return something
-    elif isinstance(something, binary_type):
+    elif isinstance(something, bytes):
         return something.decode('utf-8', 'replace')
     else:
         try:
-            return text_type(something)  # @UndefinedVariable
+            return str(something)  # @UndefinedVariable
         except (UnicodeEncodeError, UnicodeDecodeError):
             return u'<nonpresentable %s>' % type(something)  # @UndefinedVariable
 

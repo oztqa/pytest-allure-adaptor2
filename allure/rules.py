@@ -7,10 +7,9 @@ Simple object-to-XML binding mechanism.
 
 import re
 import sys
+from types import SimpleNamespace
 
-from six import u, unichr
 from lxml import objectify
-from namedlist import namedlist
 
 from allure.utils import unicodify
 
@@ -50,18 +49,18 @@ _legal_ranges = (
     (0xE000, 0xFFFD),
     (0x10000, 0x10FFFF),
 )
-_legal_xml_re = [u("%s-%s") % (unichr(low), unichr(high)) for (low, high) in _legal_ranges if low < sys.maxunicode]
-_legal_xml_re = [unichr(x) for x in _legal_chars] + _legal_xml_re
-illegal_xml_re = re.compile(u('[^%s]') % u('').join(_legal_xml_re))
+_legal_xml_re = ["%s-%s" % (chr(low), chr(high)) for (low, high) in _legal_ranges if low < sys.maxunicode]
+_legal_xml_re = [chr(x) for x in _legal_chars] + _legal_xml_re
+illegal_xml_re = re.compile('[^%s]' % ''.join(_legal_xml_re))
 
 
 def legalize_xml(arg):
     def repl(matchobj):
         i = ord(matchobj.group())
         if i <= 0xFF:
-            return u('#x%02X') % i
+            return '#x%02X' % i
         else:
-            return u('#x%04X') % i
+            return '#x%04X' % i
     return illegal_xml_re.sub(repl, arg)
 
 
@@ -113,7 +112,13 @@ class WrappedMany(Many):
 def xmlfied(el_name, namespace='', fields=[], **kw):
     items = fields + sorted(kw.items())
 
-    class MyImpl(namedlist('XMLFied', [(item[0], None) for item in items])):
+    class MyImpl(SimpleNamespace):
+        def __init__(self, *args, **kwargs):
+            names = [item[0] for item in items]
+            data = {name: None for name in names}
+            data.update(dict(zip(names, args)))
+            data.update(kwargs)
+            super().__init__(**data)
 
         def toxml(self):
             el = element_maker(el_name, namespace)

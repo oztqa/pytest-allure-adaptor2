@@ -1,5 +1,4 @@
 import os
-import sys
 from setuptools import setup
 
 PACKAGE = "pytest-allure-adaptor2"
@@ -7,12 +6,7 @@ PACKAGE = "pytest-allure-adaptor2"
 install_requires = [
     "lxml>=3.2.0",
     "pytest>=2.7.3",
-    "namedlist",
-    "six>=1.9.0"
 ]
-
-if sys.version_info < (3, 4):
-    install_requires.append("enum34")
 
 
 def read(fname):
