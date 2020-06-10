@@ -14,11 +14,11 @@ from hamcrest.core.core.allof import all_of
 
 
 def first_key(d):
-    return next(d.keys())
+    return next(iter(d.keys()))
 
 
 def first_value(d):
-    return next(d.values())
+    return next(iter(d.values()))
 
 
 @pytest.mark.parametrize("env_dict", ({'a': 1, 'b': 2}, {'a': 1, 'b': 2, 'c': 3}))
