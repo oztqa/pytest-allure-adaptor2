@@ -80,7 +80,7 @@ def labels_of(item):
 
         markers = list()
         for suitable_name in suitable_names:
-            markers.append(marker_of_node(item, suitable_name))
+            markers += item.iter_markers(suitable_name)
 
         return markers
 
